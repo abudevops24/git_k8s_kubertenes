@@ -1,0 +1,42 @@
+kind: HTTPProxy
+apiVersion: projectcontour.io/v1
+metadata:
+  name: {{ .Values.name }}
+spec:
+  routes:
+    - conditions:
+        - prefix: "/"   
+      services:
+        - name: {{ .Values.name }}
+          port: {{ .Values.service.port }}
+      timeoutPolicy:
+        idle: infinity
+        response: infinity
+      loadBalancerPolicy:
+        strategy: WeightedLeastRequest
+    - conditions:
+        - prefix: "/" # Assuming you want to match all paths
+        - header:
+            name: User-Agent
+            contains: MiuiMusic
+      services:
+        - name: dummy-service
+          port: 80
+  virtualhost:
+    fqdn: {{ .Values.virtualhost.fqdn }}
+    corsPolicy:
+      allowCredentials: true
+      allowOrigin:
+        - "*" # allows any origin
+      allowMethods:
+        - GET
+        - POST
+        - OPTIONS
+      allowHeaders:
+        - "*" # allows any origin
+      exposeHeaders:
+        - Content-Length
+        - Content-Range
+      maxAge: "10m" # preflight requests can be cached for 10 minutes.
+    tls:
+      secretName: {{ .Values.name }}

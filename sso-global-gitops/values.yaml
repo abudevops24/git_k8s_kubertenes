@@ -1,0 +1,28 @@
+name: sso-global
+replicasCount: 2
+containerPort: 80
+image:
+  name: asia-south1-docker.pkg.dev/prj-hg-apps-prod/hungama-prod-infra/sso-global
+  tag: prod-74af1439a4cb12bccb3214e7d7317969e3d79b66
+  pullPolicy: Always
+resources:
+  requests:
+    memory: 2Gi
+    cpu: 1000m
+  limits:
+    memory: 2Gi
+    cpu: 1000m
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+virtualhost:
+  fqdn: accounts.hungama.com
+hpa:
+  minReplicas: 2
+  maxReplicas: 15
+  averageUtilization: 80
+config:
+  BASE_URL: ""
+secret:
+  NEW_DB_MASTER_HOST: "172.17.128.10"
